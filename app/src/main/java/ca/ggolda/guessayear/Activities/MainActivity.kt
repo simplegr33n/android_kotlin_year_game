@@ -2,13 +2,13 @@ package ca.ggolda.guessayear.Activities
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.*
 import ca.ggolda.guessayear.R
 import kotlinx.android.synthetic.main.activity_main.*
 import android.widget.Toast
 import android.widget.SeekBar
-
-
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 
 
 class MainActivity : AppCompatActivity() {
@@ -17,27 +17,52 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Find Components
-        val figureImageImageView = findViewById<ImageView>(R.id.img_figure)
-        val figureNameTextView = findViewById<TextView>(R.id.txt_figure_name)
-        val yearSeekBar = findViewById<SeekBar>(R.id.skbr_year)
-        val yearEditText = findViewById<EditText>(R.id.edt_year)
-        val eraTextView = findViewById<TextView>(R.id.txt_era)
-        val guessButton = findViewById<Button>(R.id.btn_guess)
+        // TODO: REMOVE: You don't have to find view by id anymore! Kotlin rules.
 
         // Set Components
-        figureImageImageView.setImageDrawable(getResources().getDrawable(R.drawable.kahn_01))
-        figureNameTextView.setText("Genghis Khan")
+        img_figure.setImageDrawable(getResources().getDrawable(R.drawable.kahn_01))
+        txt_figure_name.setText("Genghis Khan")
 
 
-        // TODO: OnChangeListener for EditText so ProgressBar also responds to it
+
         // Set Year and Era Views
-        yearEditText.setText("" + yearSeekBar.progress)
+        edt_year.setText("" + skbr_year.progress)
         setEraTextView()
 
+        // Set YearText OnChangeListener
+        edt_year.addTextChangedListener(object : TextWatcher {
+
+            override fun afterTextChanged(s: Editable) {}
+
+            override fun beforeTextChanged(s: CharSequence, start: Int,
+                                           count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int,
+                                       before: Int, count: Int) {
+                val setYear = s.toString()
+                val yearInt: Int
+                if (setYear != "") {
+                    yearInt = setYear.toInt()
+                } else {
+                    yearInt = 99999
+                }
+
+                Log.e("hey","setYear: " + yearInt)
+
+                // TODO: only works for AD right now. Hacked together.
+                if (yearInt in 0..2019) {
+                    if (yearInt != skbr_year.progress && yearInt != skbr_year.progress * -1) {
+                        skbr_year.setProgress(yearInt)
+                    }
+                }
+
+            }
+        })
+
         // Set SeekBar OnChangeListener
-        yearSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            internal var progressChangedValue = yearSeekBar.progress
+        skbr_year.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            internal var progressChangedValue = skbr_year.progress
 
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 progressChangedValue = progress
@@ -47,7 +72,9 @@ class MainActivity : AppCompatActivity() {
                 if (normalizedProg < 0) {
                     normalizedProg = normalizedProg * -1
                 }
-                yearEditText.setText("" + normalizedProg)
+                if (edt_year.text.toString() != "" + normalizedProg) {
+                    edt_year.setText("" + normalizedProg)
+                }
                 setEraTextView()
             }
 
@@ -56,14 +83,12 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                Toast.makeText(this@MainActivity, "Touch Stopped at: " + progressChangedValue,
-                        Toast.LENGTH_SHORT).show()
+                // TODO Event on LetGo -- might not need
             }
         })
 
         // Set Guess ("Confirm") Button OnClickListener
-        guessButton.setOnClickListener { guessPress() }
-
+        btn_guess.setOnClickListener { guessPress() }
 
 
     }
