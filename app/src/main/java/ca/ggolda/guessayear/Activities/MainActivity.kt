@@ -10,13 +10,9 @@ import android.widget.SeekBar
 import android.text.Editable
 import android.text.TextWatcher
 import java.util.*
-import android.view.Window.FEATURE_NO_TITLE
-import android.app.Activity
 import android.app.AlertDialog
-import android.app.Dialog
 import android.content.Context
-import android.view.View
-import android.view.Window
+import android.graphics.Color
 import android.widget.Button
 import android.widget.TextView
 
@@ -147,7 +143,7 @@ class MainActivity : AppCompatActivity() {
                     + birthString + " - " + deathString, Toast.LENGTH_LONG)
             myToast.show()
 
-            showDialog(figuresList[displayIndex], "CORRECT!")
+            showDialog(figuresList[displayIndex], true)
 
 
         } else {
@@ -171,7 +167,7 @@ class MainActivity : AppCompatActivity() {
                     + birthString + " - " + deathString, Toast.LENGTH_LONG)
             myToast.show()
 
-            showDialog(figuresList[displayIndex], "WRONG!")
+            showDialog(figuresList[displayIndex], false)
         }
 
 
@@ -212,51 +208,91 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun showDialog(item: FigureModel, result: String) {
+    private fun showDialog(item: FigureModel, isCorrect: Boolean) {
         val view = layoutInflater.inflate(R.layout.dialog_result, null)
-        var dialogs = AlertDialog.Builder(this)
+        var resultsDialog = AlertDialog.Builder(this)
                 .setView(view)
                 .create()
 
+        resultsDialog.setCanceledOnTouchOutside(false)
+
         val resultCorrect = view.findViewById(R.id.txt_result) as TextView
-        resultCorrect.text = result
-
         val figureName = view.findViewById(R.id.txt_results_name) as TextView
-        figureName.text = item.name
-
         val figureDescription = view.findViewById(R.id.txt_result_description) as TextView
-        figureDescription.text = item.figureDescription
-
         val birthYear = view.findViewById(R.id.txt_results_birthyr) as TextView
-        if (item.birthYr < 0) {
-            val tempInt = item.birthYr * -1
-            birthYear.text = "" + tempInt + "BC"
+        val deathYear = view.findViewById(R.id.txt_results_deathyr) as TextView
+
+        if (isCorrect) {
+            resultCorrect.text = "CORRECT!"
+            figureName.text = item.name
+            figureDescription.text = item.figureDescription
+
+            if (item.birthYr < 0) {
+                val tempInt = item.birthYr * -1
+                birthYear.text = "" + tempInt + "BC"
+            } else {
+                birthYear.text = "" + item.birthYr
+            }
+
+            if (item.deathYr == 9999) {
+                deathYear.text = "PRESENT"
+            } else {
+                if (item.deathYr < 0) {
+                    val tempInt = item.deathYr * -1
+                    deathYear.text = "" + tempInt + "BC"
+                } else {
+                    deathYear.text = "" + item.deathYr
+                }
+            }
+
+            resultCorrect.setBackgroundColor(Color.GREEN)
+            figureName.setBackgroundColor(Color.GREEN)
+            figureDescription.setBackgroundColor(Color.GREEN)
+            birthYear.setBackgroundColor(Color.GREEN)
+            deathYear.setBackgroundColor(Color.GREEN)
+
         } else {
-            birthYear.text = "" + item.birthYr
+            resultCorrect.text = "WRONG!"
+            figureName.text = item.name
+            figureDescription.text = item.figureDescription
+
+            if (item.birthYr < 0) {
+                val tempInt = item.birthYr * -1
+                birthYear.text = "" + tempInt + "BC"
+            } else {
+                birthYear.text = "" + item.birthYr
+            }
+
+            if (item.deathYr == 9999) {
+                deathYear.text = "PRESENT"
+            } else {
+                if (item.deathYr < 0) {
+                    val tempInt = item.deathYr * -1
+                    deathYear.text = "" + tempInt + "BC"
+                } else {
+                    deathYear.text = "" + item.deathYr
+                }
+            }
+
+            resultCorrect.setBackgroundColor(Color.RED)
+            figureName.setBackgroundColor(Color.RED)
+            figureDescription.setBackgroundColor(Color.RED)
+            birthYear.setBackgroundColor(Color.RED)
+            deathYear.setBackgroundColor(Color.RED)
         }
 
-        val deathYear = view.findViewById(R.id.txt_results_deathyr) as TextView
-        if (item.deathYr == 9999) {
-            deathYear.text = "PRESENT"
-        } else {
-            if (item.deathYr < 0) {
-                val tempInt = item.deathYr * -1
-                deathYear.text = "" + tempInt + "BC"
-            } else {
-                deathYear.text = "" + item.deathYr
-            }
-        }
+
 
         val okBtn = view.findViewById(R.id.btn_ok) as Button
         okBtn.setOnClickListener {
-            if (result == "CORRECT!") {
+            if (isCorrect) {
                 // Set new item since they were right!
                 setNewItem()
             }
-            dialogs.dismiss()
+            resultsDialog.dismiss()
         }
 
-        dialogs.show()
+        resultsDialog.show()
 
     }
 
