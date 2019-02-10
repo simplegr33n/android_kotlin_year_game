@@ -1,5 +1,7 @@
 package ca.ggolda.guessayear.Activities
 
+import android.content.Context
+import android.content.res.Resources
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import ca.ggolda.guessayear.R
@@ -8,30 +10,33 @@ import android.widget.Toast
 import android.widget.SeekBar
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
+
+    lateinit var figuresList: List<FigureModel>
+    var totalListItems: Int = 0
+    var displayIndex: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // TODO: ELSEWISE - Generate Data
-        val person0 = FigureModel("0","Genghis Khan", "khan_01", "was around.", 1162, 1227,
-                10, 0)
-        val person1 = FigureModel("1","Walt Disney", "khan_01", "was around.", 1901, 1966,
-                0, 0)
-        val person2 = FigureModel("2","Socrates", "khan_01", "was around.", -470, -399,
-                10, 0)
-        val person3 = FigureModel("3","Dan Brown", "khan_01", "was around.", 1964, 9999,
-                0, 0)
-        val data = listOf(person0, person1, person2, person3)
+        // Generate Data
+        figuresList = generateDummyList().data
+        totalListItems = figuresList.size
 
+        // Pick Random Item From List
+        displayIndex = grabRandomFromList().index
 
         // Set Components
-        img_figure.setImageDrawable(getResources().getDrawable(R.drawable.khan_01))
-        txt_figure_name.setText(data[3].name)
+        img_figure.setImageDrawable(getResources().getDrawable(resIdByName( figuresList[displayIndex].imgSrc, "drawable")))
+
+
+
+
+        txt_figure_name.setText(figuresList[displayIndex].name)
 
 
 
@@ -58,7 +63,7 @@ class MainActivity : AppCompatActivity() {
                     yearInt = 99999
                 }
 
-                Log.e("hey","setYear: " + yearInt)
+
 
                 // TODO: only works for AD right now. Hacked together.
                 if (yearInt in 0..2019) {
@@ -103,9 +108,16 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun guessPress() {
-        val myToast = Toast.makeText(this, "Guess: " + edt_year.text + " " + txt_era.text, Toast.LENGTH_LONG)
-        myToast.show()
+    private fun guessPress() {
+        if (skbr_year.progress in figuresList[displayIndex].birthYr..figuresList[displayIndex].deathYr) {
+            val myToast = Toast.makeText(this, "Guess: " + edt_year.text + " " + txt_era.text +" is RIGHT!", Toast.LENGTH_LONG)
+            myToast.show()
+        } else {
+            val myToast = Toast.makeText(this, "Guess: " + edt_year.text + " " + txt_era.text +" is WRONG!", Toast.LENGTH_LONG)
+            myToast.show()
+        }
+
+
     }
 
     fun setEraTextView() {
@@ -115,6 +127,34 @@ class MainActivity : AppCompatActivity() {
             txt_era.setText("BC")
         }
     }
+
+    private fun generateDummyList() = object {
+        val person0 = FigureModel("0","Genghis Khan", "genghis_khan_1227", "was around.", 1162, 1227,
+                10, 0)
+        val person1 = FigureModel("1","Walt Disney", "walt_disney_1966", "was around.", 1901, 1966,
+                0, 0)
+        val person2 = FigureModel("2","Socrates", "socrates_399n", "was around.", -470, -399,
+                10, 0)
+        val person3 = FigureModel("3","Dan Brown", "dan_brown_9999", "was around.", 1964, 9999,
+                0, 0)
+        val data: List<FigureModel> = listOf(person0, person1, person2, person3)
+    }
+
+    private fun grabRandomFromList() = object {
+        // Get Random Item based on available range
+        var r = Random()
+        val randInt = r.nextInt(totalListItems)
+        val index: Int = randInt
+    }
+
+    private fun resIdByName(resIdName: String?, resType: String): Int {
+        resIdName?.let {
+            return resources.getIdentifier(it, resType, packageName)
+        }
+        throw Resources.NotFoundException()
+    }
+
+
 
 }
 

@@ -29,7 +29,7 @@
             android:id="@+id/txt_figure_name"/>
 
         <ImageView
-            tools:src="@drawable/khan_01"
+            tools:src="@drawable/genghis_khan_1227"
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:id="@+id/img_figure"/>
@@ -38,8 +38,8 @@
         <SeekBar
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:layout_marginRight="40dp"
-            android:layout_marginLeft="40dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
             android:minHeight="3dp"
             android:maxHeight="3dp"
             android:max="2019"
