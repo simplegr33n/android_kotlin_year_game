@@ -29,7 +29,7 @@
             android:id="@+id/txt_figure_name"/>
 
         <ImageView
-            tools:src="@drawable/kahn_01"
+            tools:src="@drawable/khan_01"
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:id="@+id/img_figure"/>

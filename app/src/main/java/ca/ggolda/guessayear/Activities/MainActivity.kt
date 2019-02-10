@@ -17,11 +17,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // TODO: REMOVE: You don't have to find view by id anymore! Kotlin rules.
+        // TODO: ELSEWISE - Generate Data
+        val person0 = FigureModel("0","Genghis Khan", "khan_01", "was around.", 1162, 1227,
+                10, 0)
+        val person1 = FigureModel("1","Walt Disney", "khan_01", "was around.", 1901, 1966,
+                0, 0)
+        val person2 = FigureModel("2","Socrates", "khan_01", "was around.", -470, -399,
+                10, 0)
+        val person3 = FigureModel("3","Dan Brown", "khan_01", "was around.", 1964, 9999,
+                0, 0)
+        val data = listOf(person0, person1, person2, person3)
+
 
         // Set Components
-        img_figure.setImageDrawable(getResources().getDrawable(R.drawable.kahn_01))
-        txt_figure_name.setText("Genghis Khan")
+        img_figure.setImageDrawable(getResources().getDrawable(R.drawable.khan_01))
+        txt_figure_name.setText(data[3].name)
 
 
 
@@ -109,5 +119,4 @@ class MainActivity : AppCompatActivity() {
 }
 
 data class FigureModel(var id: String, var name: String, var imgSrc: String, var figureDescription: String,
-                       var birthYr: Int, var deathYr: Int, var exactBirth: Boolean, var exactDeath: Boolean,
-                       var eraText: String)
+                       var birthYr: Int, var deathYr: Int, var birthError: Int, var deathError: Int)
