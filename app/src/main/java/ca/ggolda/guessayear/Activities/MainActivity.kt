@@ -1,6 +1,5 @@
 package ca.ggolda.guessayear.Activities
 
-import android.content.Context
 import android.content.res.Resources
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -27,17 +26,9 @@ class MainActivity : AppCompatActivity() {
         figuresList = generateDummyList().data
         totalListItems = figuresList.size
 
-        // Pick Random Item From List
-        displayIndex = grabRandomFromList().index
 
-        // Set Components
-        img_figure.setImageDrawable(getResources().getDrawable(resIdByName( figuresList[displayIndex].imgSrc, "drawable")))
-
-
-
-
-        txt_figure_name.setText(figuresList[displayIndex].name)
-
+        // Set New Item
+        setNewItem()
 
 
         // Set Year and Era Views
@@ -108,12 +99,64 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun setNewItem() {
+        // Pick Random Item From List
+        displayIndex = grabRandomFromList().index
+
+        // Set Components
+        img_figure.setImageDrawable(getResources().getDrawable(resIdByName( figuresList[displayIndex].imgSrc, "drawable")))
+        txt_figure_name.setText(figuresList[displayIndex].name)
+    }
+
     private fun guessPress() {
-        if (skbr_year.progress in figuresList[displayIndex].birthYr..figuresList[displayIndex].deathYr) {
-            val myToast = Toast.makeText(this, "Guess: " + edt_year.text + " " + txt_era.text +" is RIGHT!", Toast.LENGTH_LONG)
+        val birthYear: Int = figuresList[displayIndex].birthYr
+        val deathYear: Int = figuresList[displayIndex].deathYr
+        val birthString: String
+        val deathString: String
+
+        if (skbr_year.progress in birthYear..deathYear) {
+            if (birthYear < 0) {
+                val tempYear = (birthYear * -1)
+                birthString = "" + tempYear + "BC"
+            } else {
+                birthString = "" + birthYear
+            }
+            if (deathYear < 0) {
+                val tempYear = (deathYear * -1)
+                deathString = "" + tempYear + "BC"
+            } else if (deathYear == 9999) {
+                deathString = "Present"
+            } else {
+                deathString = "" + deathYear
+            }
+
+
+            val myToast = Toast.makeText(this, "" + edt_year.text + " " + txt_era.text +" is RIGHT! \n"
+                    + birthString + " - " + deathString, Toast.LENGTH_LONG)
             myToast.show()
+
+            // Set new item since they were right!
+            setNewItem()
+
         } else {
-            val myToast = Toast.makeText(this, "Guess: " + edt_year.text + " " + txt_era.text +" is WRONG!", Toast.LENGTH_LONG)
+            if (birthYear < 0) {
+                val tempYear = (birthYear * -1)
+                birthString = "" + tempYear + "BC"
+            } else {
+                birthString = "" + birthYear
+            }
+            if (deathYear < 0) {
+                val tempYear = (deathYear * -1)
+                deathString = "" + tempYear + "BC"
+            } else if (deathYear == 9999) {
+                deathString = "Present"
+            } else {
+                deathString = "" + deathYear
+            }
+
+
+            val myToast = Toast.makeText(this, "" + edt_year.text + " " + txt_era.text +" is WRONG! \n"
+                    + birthString + " - " + deathString, Toast.LENGTH_LONG)
             myToast.show()
         }
 
