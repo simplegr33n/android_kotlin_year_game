@@ -10,6 +10,15 @@ import android.widget.SeekBar
 import android.text.Editable
 import android.text.TextWatcher
 import java.util.*
+import android.view.Window.FEATURE_NO_TITLE
+import android.app.Activity
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.Context
+import android.view.View
+import android.view.Window
+import android.widget.Button
+import android.widget.TextView
 
 
 class MainActivity : AppCompatActivity() {
@@ -17,10 +26,13 @@ class MainActivity : AppCompatActivity() {
     lateinit var figuresList: List<FigureModel>
     var totalListItems: Int = 0
     var displayIndex: Int = 0
+    lateinit var mContext: Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        mContext = applicationContext
 
         // Generate Data
         figuresList = generateDummyList().data
@@ -135,8 +147,8 @@ class MainActivity : AppCompatActivity() {
                     + birthString + " - " + deathString, Toast.LENGTH_LONG)
             myToast.show()
 
-            // Set new item since they were right!
-            setNewItem()
+            showDialog(figuresList[displayIndex], "CORRECT!")
+
 
         } else {
             if (birthYear < 0) {
@@ -158,6 +170,8 @@ class MainActivity : AppCompatActivity() {
             val myToast = Toast.makeText(this, "" + edt_year.text + " " + txt_era.text +" is WRONG! \n"
                     + birthString + " - " + deathString, Toast.LENGTH_LONG)
             myToast.show()
+
+            showDialog(figuresList[displayIndex], "WRONG!")
         }
 
 
@@ -198,8 +212,58 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private fun showDialog(item: FigureModel, result: String) {
+        val view = layoutInflater.inflate(R.layout.dialog_result, null)
+        var dialogs = AlertDialog.Builder(this)
+                .setView(view)
+                .create()
+
+        val resultCorrect = view.findViewById(R.id.txt_result) as TextView
+        resultCorrect.text = result
+
+        val figureName = view.findViewById(R.id.txt_results_name) as TextView
+        figureName.text = item.name
+
+        val figureDescription = view.findViewById(R.id.txt_result_description) as TextView
+        figureDescription.text = item.figureDescription
+
+        val birthYear = view.findViewById(R.id.txt_results_birthyr) as TextView
+        if (item.birthYr < 0) {
+            val tempInt = item.birthYr * -1
+            birthYear.text = "" + tempInt + "BC"
+        } else {
+            birthYear.text = "" + item.birthYr
+        }
+
+        val deathYear = view.findViewById(R.id.txt_results_deathyr) as TextView
+        if (item.deathYr == 9999) {
+            deathYear.text = "PRESENT"
+        } else {
+            if (item.deathYr < 0) {
+                val tempInt = item.deathYr * -1
+                deathYear.text = "" + tempInt + "BC"
+            } else {
+                deathYear.text = "" + item.deathYr
+            }
+        }
+
+        val okBtn = view.findViewById(R.id.btn_ok) as Button
+        okBtn.setOnClickListener {
+            if (result == "CORRECT!") {
+                // Set new item since they were right!
+                setNewItem()
+            }
+            dialogs.dismiss()
+        }
+
+        dialogs.show()
+
+    }
+
 
 }
+
+
 
 data class FigureModel(var id: String, var name: String, var imgSrc: String, var figureDescription: String,
                        var birthYr: Int, var deathYr: Int, var birthError: Int, var deathError: Int)
