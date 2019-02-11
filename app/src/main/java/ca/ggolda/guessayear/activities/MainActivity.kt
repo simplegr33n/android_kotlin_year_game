@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import ca.ggolda.guessayear.R
 import kotlinx.android.synthetic.main.activity_main.*
-import android.widget.Toast
 import android.widget.SeekBar
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,7 +14,8 @@ import android.content.Context
 import android.graphics.Color
 import android.support.v4.content.res.ResourcesCompat
 import android.widget.Button
-import android.widget.TextView
+import ca.ggolda.guessayear.data.FigureModel
+import kotlinx.android.synthetic.main.dialog_result.view.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -207,11 +207,12 @@ class MainActivity : AppCompatActivity() {
 
         resultsDialog.setCanceledOnTouchOutside(false)
 
-        val resultCorrect = view.findViewById(R.id.txt_result) as TextView
-        val figureName = view.findViewById(R.id.txt_results_name) as TextView
-        val figureDescription = view.findViewById(R.id.txt_result_description) as TextView
-        val birthYear = view.findViewById(R.id.txt_results_birthyr) as TextView
-        val deathYear = view.findViewById(R.id.txt_results_deathyr) as TextView
+        val dialogLayout = view.lyt_result_dialog
+        val resultCorrect = view.txt_result
+        val figureName = view.txt_results_name
+        val figureDescription = view.txt_result_description
+        val birthYear = view.txt_results_birthyr
+        val deathYear = view.txt_results_deathyr
 
         if (isCorrect) {
             resultCorrect.text = "CORRECT!"
@@ -236,11 +237,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            resultCorrect.setBackgroundColor(Color.GREEN)
-            figureName.setBackgroundColor(Color.GREEN)
-            figureDescription.setBackgroundColor(Color.GREEN)
-            birthYear.setBackgroundColor(Color.GREEN)
-            deathYear.setBackgroundColor(Color.GREEN)
+            dialogLayout.setBackgroundColor(Color.GREEN)
+
 
         } else {
             resultCorrect.text = "WRONG!"
@@ -266,11 +264,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            resultCorrect.setBackgroundColor(Color.RED)
-            figureName.setBackgroundColor(Color.RED)
-            figureDescription.setBackgroundColor(Color.RED)
-            birthYear.setBackgroundColor(Color.RED)
-            deathYear.setBackgroundColor(Color.RED)
+            dialogLayout.setBackgroundColor(Color.RED)
+
         }
 
 
@@ -290,6 +285,3 @@ class MainActivity : AppCompatActivity() {
 
 }
 
-
-data class FigureModel(var id: String, var name: String, var imgSrc: String, var figureDescription: String,
-                       var birthYr: Int, var deathYr: Int, var birthError: Int, var deathError: Int)

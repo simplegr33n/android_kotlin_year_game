@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
+    android:id="@+id/lyt_result_dialog"
     android:background="#36376d"
     android:orientation="vertical">
 
