@@ -10,10 +10,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import java.util.*
 import android.app.AlertDialog
-import android.content.Context
-import android.graphics.Color
+import android.support.v4.content.ContextCompat
 import android.support.v4.content.res.ResourcesCompat
 import android.widget.Button
+import ca.ggolda.guessayear.data.DummyDataGen
 import ca.ggolda.guessayear.data.FigureModel
 import kotlinx.android.synthetic.main.dialog_result.view.*
 
@@ -23,22 +23,18 @@ class MainActivity : AppCompatActivity() {
     lateinit var figuresList: List<FigureModel>
     var totalListItems: Int = 0
     var displayIndex: Int = 0
-    lateinit var mContext: Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mContext = applicationContext
-
         // Generate Data
-        figuresList = generateDummyList().data
+        figuresList = DummyDataGen.genDummyList()
         totalListItems = figuresList.size
 
 
         // Set New Item
         setNewItem()
-
 
         // Set Year and Era Views
         edt_year.setText("" + skbr_year.progress)
@@ -49,12 +45,9 @@ class MainActivity : AppCompatActivity() {
 
             override fun afterTextChanged(s: Editable) {}
 
-            override fun beforeTextChanged(s: CharSequence, start: Int,
-                                           count: Int, after: Int) {
-            }
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(s: CharSequence, start: Int,
-                                       before: Int, count: Int) {
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 val yearString = s.toString()
                 var yearInt: Int
                 yearInt = if (yearString != "") {
@@ -88,10 +81,6 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     edt_year.hint = "" + skbr_year.progress
                 }
-
-
-
-
             }
         })
 
@@ -172,17 +161,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun generateDummyList() = object {
-        val person0 = FigureModel("0", "Genghis Khan", "genghis_khan_1227", "was around.", 1162, 1227,
-                10, 0)
-        val person1 = FigureModel("1", "Walt Disney", "walt_disney_1966", "was around.", 1901, 1966,
-                0, 0)
-        val person2 = FigureModel("2", "Socrates", "socrates_399n", "was around.", -470, -399,
-                10, 0)
-        val person3 = FigureModel("3", "Dan Brown", "dan_brown_9999", "was around.", 1964, 9999,
-                0, 0)
-        val data: List<FigureModel> = listOf(person0, person1, person2, person3)
-    }
 
     private fun grabRandomFromList() = object {
         // Get Random Item based on available range
@@ -237,7 +215,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            dialogLayout.setBackgroundColor(Color.GREEN)
+            dialogLayout.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorCorrect))
 
 
         } else {
@@ -260,11 +238,10 @@ class MainActivity : AppCompatActivity() {
                     deathYear.text = "" + tempInt + "BC"
                 } else {
                     deathYear.text = "" + item.deathYr
-                    deathYear.getText()
                 }
             }
 
-            dialogLayout.setBackgroundColor(Color.RED)
+            dialogLayout.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorIncorrect))
 
         }
 

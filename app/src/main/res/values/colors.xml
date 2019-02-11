@@ -10,6 +10,6 @@
 
     <color name="colorNameText">#aea744</color>
 
-    <color name="colorCorrect">#35e746</color>
-    <color name="colorIncorrect">#f51130</color>
+    <color name="colorCorrect">#10811b</color>
+    <color name="colorIncorrect">#ae0101</color>
 </resources>

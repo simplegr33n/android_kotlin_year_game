@@ -23,5 +23,4 @@ class FigureModel {
         this.deathError = deathError
     }
 
-
 }
