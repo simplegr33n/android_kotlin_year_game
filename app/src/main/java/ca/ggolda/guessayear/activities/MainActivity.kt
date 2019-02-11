@@ -1,4 +1,4 @@
-package ca.ggolda.guessayear.Activities
+package ca.ggolda.guessayear.activities
 
 import android.content.res.Resources
 import android.support.v7.app.AppCompatActivity
@@ -13,6 +13,7 @@ import java.util.*
 import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
+import android.support.v4.content.res.ResourcesCompat
 import android.widget.Button
 import android.widget.TextView
 
@@ -54,22 +55,42 @@ class MainActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence, start: Int,
                                        before: Int, count: Int) {
-                val setYear = s.toString()
-                val yearInt: Int
-                if (setYear != "") {
-                    yearInt = setYear.toInt()
+                val yearString = s.toString()
+                var yearInt: Int
+                yearInt = if (yearString != "") {
+                    yearString.toInt()
                 } else {
-                    yearInt = 99999
+                    99999
                 }
 
+                if (txt_era.text == "BC") {
+                    yearInt *= -1
+                }
 
+                // Set SeekBar if differs from TextView
+                if (yearInt != 99999 && yearInt != -99999) {
+                    if (yearInt in -2000..2019) {
+                        if (yearInt != skbr_year.progress) {
+                            skbr_year.progress = yearInt
+                        }
+                    } else if (yearInt > 2019) {
+                        yearInt = 2019
+                        if (yearInt != skbr_year.progress) {
+                            skbr_year.progress = yearInt
+                        }
 
-                // TODO: only works for AD right now. Hacked together.
-                if (yearInt in 0..2019) {
-                    if (yearInt != skbr_year.progress && yearInt != skbr_year.progress * -1) {
-                        skbr_year.setProgress(yearInt)
+                    } else if (yearInt < -2000) {
+                        yearInt = -2000
+                        if (yearInt != skbr_year.progress) {
+                            skbr_year.progress = yearInt
+                        }
                     }
+                } else {
+                    edt_year.hint = "" + skbr_year.progress
                 }
+
+
+
 
             }
         })
@@ -84,7 +105,7 @@ class MainActivity : AppCompatActivity() {
 
                 // Normalize for TextView
                 if (normalizedProg < 0) {
-                    normalizedProg = normalizedProg * -1
+                    normalizedProg *= -1
                 }
                 if (edt_year.text.toString() != "" + normalizedProg) {
                     edt_year.setText("" + normalizedProg)
@@ -103,8 +124,22 @@ class MainActivity : AppCompatActivity() {
 
         // Set Guess ("Confirm") Button OnClickListener
         btn_guess.setOnClickListener { guessPress() }
+        txt_era.setOnClickListener { changeEra() }
 
+    }
 
+    private fun changeEra() {
+        if (txt_era.text == "AD") {
+            if (skbr_year.progress > 0) {
+                skbr_year.progress = skbr_year.progress * -1
+            }
+            txt_era.text = "BC"
+        } else {
+            if (skbr_year.progress < 0) {
+                skbr_year.progress = skbr_year.progress * -1
+            }
+            txt_era.text = "AD"
+        }
     }
 
     private fun setNewItem() {
@@ -112,61 +147,17 @@ class MainActivity : AppCompatActivity() {
         displayIndex = grabRandomFromList().index
 
         // Set Components
-        img_figure.setImageDrawable(getResources().getDrawable(resIdByName( figuresList[displayIndex].imgSrc, "drawable")))
-        txt_figure_name.setText(figuresList[displayIndex].name)
+        img_figure.setImageDrawable(ResourcesCompat.getDrawable(resources, resIdByName(figuresList[displayIndex].imgSrc, "drawable"), null))
+        txt_figure_name.text = figuresList[displayIndex].name
     }
 
     private fun guessPress() {
         val birthYear: Int = figuresList[displayIndex].birthYr
         val deathYear: Int = figuresList[displayIndex].deathYr
-        val birthString: String
-        val deathString: String
 
         if (skbr_year.progress in birthYear..deathYear) {
-            if (birthYear < 0) {
-                val tempYear = (birthYear * -1)
-                birthString = "" + tempYear + "BC"
-            } else {
-                birthString = "" + birthYear
-            }
-            if (deathYear < 0) {
-                val tempYear = (deathYear * -1)
-                deathString = "" + tempYear + "BC"
-            } else if (deathYear == 9999) {
-                deathString = "Present"
-            } else {
-                deathString = "" + deathYear
-            }
-
-
-            val myToast = Toast.makeText(this, "" + edt_year.text + " " + txt_era.text +" is RIGHT! \n"
-                    + birthString + " - " + deathString, Toast.LENGTH_LONG)
-            myToast.show()
-
             showDialog(figuresList[displayIndex], true)
-
-
         } else {
-            if (birthYear < 0) {
-                val tempYear = (birthYear * -1)
-                birthString = "" + tempYear + "BC"
-            } else {
-                birthString = "" + birthYear
-            }
-            if (deathYear < 0) {
-                val tempYear = (deathYear * -1)
-                deathString = "" + tempYear + "BC"
-            } else if (deathYear == 9999) {
-                deathString = "Present"
-            } else {
-                deathString = "" + deathYear
-            }
-
-
-            val myToast = Toast.makeText(this, "" + edt_year.text + " " + txt_era.text +" is WRONG! \n"
-                    + birthString + " - " + deathString, Toast.LENGTH_LONG)
-            myToast.show()
-
             showDialog(figuresList[displayIndex], false)
         }
 
@@ -175,20 +166,20 @@ class MainActivity : AppCompatActivity() {
 
     fun setEraTextView() {
         if (skbr_year.progress >= 0) {
-            txt_era.setText("AD")
+            txt_era.text = "AD"
         } else {
-            txt_era.setText("BC")
+            txt_era.text = "BC"
         }
     }
 
     private fun generateDummyList() = object {
-        val person0 = FigureModel("0","Genghis Khan", "genghis_khan_1227", "was around.", 1162, 1227,
+        val person0 = FigureModel("0", "Genghis Khan", "genghis_khan_1227", "was around.", 1162, 1227,
                 10, 0)
-        val person1 = FigureModel("1","Walt Disney", "walt_disney_1966", "was around.", 1901, 1966,
+        val person1 = FigureModel("1", "Walt Disney", "walt_disney_1966", "was around.", 1901, 1966,
                 0, 0)
-        val person2 = FigureModel("2","Socrates", "socrates_399n", "was around.", -470, -399,
+        val person2 = FigureModel("2", "Socrates", "socrates_399n", "was around.", -470, -399,
                 10, 0)
-        val person3 = FigureModel("3","Dan Brown", "dan_brown_9999", "was around.", 1964, 9999,
+        val person3 = FigureModel("3", "Dan Brown", "dan_brown_9999", "was around.", 1964, 9999,
                 0, 0)
         val data: List<FigureModel> = listOf(person0, person1, person2, person3)
     }
@@ -271,6 +262,7 @@ class MainActivity : AppCompatActivity() {
                     deathYear.text = "" + tempInt + "BC"
                 } else {
                     deathYear.text = "" + item.deathYr
+                    deathYear.getText()
                 }
             }
 
@@ -280,7 +272,6 @@ class MainActivity : AppCompatActivity() {
             birthYear.setBackgroundColor(Color.RED)
             deathYear.setBackgroundColor(Color.RED)
         }
-
 
 
         val okBtn = view.findViewById(R.id.btn_ok) as Button
@@ -298,7 +289,6 @@ class MainActivity : AppCompatActivity() {
 
 
 }
-
 
 
 data class FigureModel(var id: String, var name: String, var imgSrc: String, var figureDescription: String,

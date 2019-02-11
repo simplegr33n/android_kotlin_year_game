@@ -1,88 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@color/colorBackground"
     android:gravity="center"
-    tools:context=".Activities.MainActivity"
-    android:background="@color/colorBackground">
+    android:orientation="horizontal"
+    tools:context=".activities.MainActivity">
 
-    <LinearLayout
-        android:layout_width="300dp"
-        android:layout_height="400dp"
-        android:minWidth="80pt"
-        android:orientation="vertical"
-        android:background="@color/colorForeground"
-        android:gravity="center"
-        android:padding="16dp">
-
-        <TextView
-            android:textAlignment="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Genghis Khan"
-            android:textSize="36dp"
-            android:textColor="@color/colorName"
-            android:textStyle="bold"
-            android:id="@+id/txt_figure_name"/>
+    <HorizontalScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
 
         <ImageView
-            tools:src="@drawable/genghis_khan_1227"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:id="@+id/img_figure"/>
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/scrollbg" />
+
+    </HorizontalScrollView>
 
 
-        <SeekBar
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:minHeight="3dp"
-            android:maxHeight="3dp"
-            android:max="2019"
-            android:min="-5000"
-            android:progress="1950"
-            android:id="@+id/skbr_year"
-            android:progressDrawable="@drawable/progress_pathbar"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="40dp"
+        android:background="@color/colorForegroundTrans"
+        android:gravity="center"
+        android:minWidth="80pt"
+        android:layout_centerInParent="true"
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center">
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="25,000"
-                android:textSize="28dp"
-                android:textStyle="bold"
-                android:digits="0123456789"
-                android:inputType="number"
-                android:id="@+id/edt_year"/>
+            android:gravity="center"
+            android:minWidth="80pt"
+            android:orientation="vertical">
 
             <TextView
+                android:id="@+id/txt_figure_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="BC"
-                android:text="AD"
-                android:textSize="28dp"
+                android:textAlignment="center"
+                android:textColor="@color/colorNameText"
+                android:textSize="36dp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
-                android:id="@+id/txt_era"/>
+                tools:text="Genghis Khan" />
+
+            <ImageView
+                android:id="@+id/img_figure"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                tools:src="@drawable/genghis_khan_1227" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <EditText
+                    android:id="@+id/edt_year"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:digits="0123456789"
+                    android:inputType="number"
+                    android:textSize="28dp"
+                    android:textStyle="bold"
+                    tools:text="25,000" />
+
+                <TextView
+                    android:id="@+id/txt_era"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AD"
+                    android:textColor="@android:color/black"
+                    android:textSize="28dp"
+                    android:textStyle="bold"
+                    tools:text="BC" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_guess"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="9"
+                android:width="150dp"
+                android:text="CONFIRM" />
 
         </LinearLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="9"
-            android:width="150dp"
-            android:text="CONFIRM"
-            android:id="@+id/btn_guess"/>
+        <ca.ggolda.guessayear.utils.VerticalSeekBar
+            android:id="@+id/skbr_year"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:max="2019"
+            android:maxHeight="3dp"
+            android:min="-2000"
+            android:minHeight="3dp"
+            android:progress="1950"
+            android:progressDrawable="@drawable/progress_pathbar"/>
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
