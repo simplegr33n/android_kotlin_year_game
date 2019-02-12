@@ -14,7 +14,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.content.res.ResourcesCompat
 import android.util.Log
 import android.widget.Button
-import ca.ggolda.guessayear.data.DummyDataGen
+import ca.ggolda.guessayear.utils.DummyDataGen
 import ca.ggolda.guessayear.data.FigureModel
 import kotlinx.android.synthetic.main.dialog_result.view.*
 
@@ -54,9 +54,7 @@ class MainActivity : AppCompatActivity() {
         // Set ScrollView OnScrollChangeListener
         scroll_years.viewTreeObserver.addOnScrollChangedListener({
             val scrollX = scroll_years.scrollX // For HorizontalScrollView
-            // Change Year Based on Scroll Position
-            Log.e("Scroll (X, width)", "($scrollX, $scrollableRange)")
-
+            // Get Year Based on Scroll Position
             val positionToYear = ((scrollX.toFloat() / scrollableRange.toFloat()) * (maxYEAR - minYEAR) + minYEAR).toInt()
 
             setYearFromScroll(positionToYear)
@@ -231,7 +229,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun setEraTextView() {
+    private fun setEraTextView() {
         if (curYEAR >= 0) {
             txt_era.text = "AD"
         } else {
@@ -267,7 +265,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showDialog(item: FigureModel, isCorrect: Boolean) {
         val view = layoutInflater.inflate(R.layout.dialog_result, null)
-        var resultsDialog = AlertDialog.Builder(this)
+        val resultsDialog = AlertDialog.Builder(this)
                 .setView(view)
                 .create()
 
