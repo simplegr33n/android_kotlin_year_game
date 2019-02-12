@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import ca.ggolda.guessayear.R
 import kotlinx.android.synthetic.main.activity_main.*
-import android.widget.SeekBar
 import android.text.Editable
 import android.text.TextWatcher
 import java.util.*
@@ -18,7 +17,7 @@ import android.widget.Button
 import ca.ggolda.guessayear.data.DummyDataGen
 import ca.ggolda.guessayear.data.FigureModel
 import kotlinx.android.synthetic.main.dialog_result.view.*
-import kotlin.math.max
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -142,42 +141,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-//        // Set SeekBar OnChangeListener
-//        skbr_year.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-//            internal var progressChangedValue = curYEAR
-//
-//            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-//                progressChangedValue = progress
-//
-//                if (progress == 0) {
-//                    if (txt_era.text == "AD") {
-//                        curYEAR = 1
-//                    } else {
-//                        curYEAR = -1
-//                    }
-//                } else {
-//                    var normalizedProg = progress
-//
-//                    // Normalize for TextView
-//                    if (normalizedProg < 0) {
-//                        normalizedProg *= -1
-//                    }
-//                    if (edt_year.text.toString() != "" + normalizedProg) {
-//                        edt_year.setText("" + normalizedProg)
-//                    }
-//                    setEraTextView()
-//                }
-//
-//            }
-//
-//            override fun onStartTrackingTouch(seekBar: SeekBar) {
-//                // TODO Auto-generated method stub -- play sound?
-//            }
-//
-//            override fun onStopTrackingTouch(seekBar: SeekBar) {
-//                // TODO Event on LetGo -- might not need
-//            }
-//        })
 
         // Set Guess ("Confirm") Button OnClickListener
         btn_guess.setOnClickListener { guessPress() }
@@ -199,12 +162,12 @@ class MainActivity : AppCompatActivity() {
     private fun changeEra() {
         if (txt_era.text == "AD") {
             if (curYEAR > 0) {
-                curYEAR = curYEAR * -1
+                curYEAR *= -1
             }
             txt_era.text = "BC"
         } else {
             if (curYEAR < 0) {
-                curYEAR = curYEAR * -1
+                curYEAR *= -1
             }
             txt_era.text = "AD"
         }
