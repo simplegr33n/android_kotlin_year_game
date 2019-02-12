@@ -18,12 +18,15 @@ import android.widget.Button
 import ca.ggolda.guessayear.data.DummyDataGen
 import ca.ggolda.guessayear.data.FigureModel
 import kotlinx.android.synthetic.main.dialog_result.view.*
+import kotlin.math.max
 
 
 class MainActivity : AppCompatActivity() {
 
+    val startYEAR: Int = 1
     val maxYEAR: Int = 2019
     val minYEAR: Int = -2000
+    var curYEAR: Int = 1
     private val aliveCODE: Int = 9999
 
     private lateinit var figuresList: List<FigureModel>
@@ -44,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         setNewItem()
 
         // Set Year and Era Views
-        edt_year.setText("" + skbr_year.progress)
+        edt_year.setText("" + startYEAR)
         setEraTextView()
 
 
@@ -61,9 +64,19 @@ class MainActivity : AppCompatActivity() {
 
             Log.e("ScrollViewToYear", "$positionToYear")
 
-            val scrollYearSet = positionToYear.toInt()
+            var scrollYearSet = positionToYear.toInt()
 
-            skbr_year.progress = scrollYearSet
+            if (scrollYearSet > 0) {
+                edt_year.setText("" + scrollYearSet)
+                setEra("AD")
+            } else if (scrollYearSet < 0) {
+                edt_year.setText("" + scrollYearSet * -1)
+                setEra("BC")
+            } else if (scrollYearSet == 0) {
+                edt_year.setText("1")
+            }
+
+
 
         })
 
@@ -88,14 +101,8 @@ class MainActivity : AppCompatActivity() {
                     edt_year.setText("1")
 
                     if (txt_era.text == "AD") {
-                        if (skbr_year.progress != 1) {
-                            skbr_year.progress = 1
-                        }
                         1
                     } else {
-                        if (skbr_year.progress != -1) {
-                            skbr_year.progress = -1
-                        }
                         -1
                     }
 
@@ -110,67 +117,67 @@ class MainActivity : AppCompatActivity() {
                 // Set SeekBar if differs from TextView
                 if (yearInt != 0) {
                     if (yearInt in minYEAR..maxYEAR) {
-                        if (yearInt != skbr_year.progress) {
-                            skbr_year.progress = yearInt
+                        if (yearInt != curYEAR) {
+                            curYEAR = yearInt
                         }
                     } else if (yearInt > maxYEAR) {
                         yearInt = maxYEAR
-                        if (yearInt != skbr_year.progress) {
-                            skbr_year.progress = yearInt
+                        if (yearInt != curYEAR) {
+                            curYEAR = yearInt
                         }
 
                     } else if (yearInt < minYEAR) {
                         yearInt = minYEAR
-                        if (yearInt != skbr_year.progress) {
-                            skbr_year.progress = yearInt
+                        if (yearInt != curYEAR) {
+                            curYEAR = yearInt
                         }
                     }
                 } else {
-                    if (skbr_year.progress > 0) {
-                        edt_year.hint = "" + skbr_year.progress
+                    if (curYEAR > 0) {
+                        edt_year.hint = "" + curYEAR
                     } else {
-                        edt_year.hint = "" + skbr_year.progress * -1
+                        edt_year.hint = "" + curYEAR * -1
                     }
                 }
             }
         })
 
-        // Set SeekBar OnChangeListener
-        skbr_year.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            internal var progressChangedValue = skbr_year.progress
-
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                progressChangedValue = progress
-
-                if (progress == 0) {
-                    if (txt_era.text == "AD") {
-                        skbr_year.progress = 1
-                    } else {
-                        skbr_year.progress = -1
-                    }
-                } else {
-                    var normalizedProg = progress
-
-                    // Normalize for TextView
-                    if (normalizedProg < 0) {
-                        normalizedProg *= -1
-                    }
-                    if (edt_year.text.toString() != "" + normalizedProg) {
-                        edt_year.setText("" + normalizedProg)
-                    }
-                    setEraTextView()
-                }
-
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-                // TODO Auto-generated method stub -- play sound?
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-                // TODO Event on LetGo -- might not need
-            }
-        })
+//        // Set SeekBar OnChangeListener
+//        skbr_year.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+//            internal var progressChangedValue = curYEAR
+//
+//            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+//                progressChangedValue = progress
+//
+//                if (progress == 0) {
+//                    if (txt_era.text == "AD") {
+//                        curYEAR = 1
+//                    } else {
+//                        curYEAR = -1
+//                    }
+//                } else {
+//                    var normalizedProg = progress
+//
+//                    // Normalize for TextView
+//                    if (normalizedProg < 0) {
+//                        normalizedProg *= -1
+//                    }
+//                    if (edt_year.text.toString() != "" + normalizedProg) {
+//                        edt_year.setText("" + normalizedProg)
+//                    }
+//                    setEraTextView()
+//                }
+//
+//            }
+//
+//            override fun onStartTrackingTouch(seekBar: SeekBar) {
+//                // TODO Auto-generated method stub -- play sound?
+//            }
+//
+//            override fun onStopTrackingTouch(seekBar: SeekBar) {
+//                // TODO Event on LetGo -- might not need
+//            }
+//        })
 
         // Set Guess ("Confirm") Button OnClickListener
         btn_guess.setOnClickListener { guessPress() }
@@ -184,19 +191,30 @@ class MainActivity : AppCompatActivity() {
         scrollWidth = scroll_years.getChildAt(0).width - scroll_years.width
         Log.e("scrollWidth)", "($scrollWidth)")
 
+        val initScrollPos = (((curYEAR - minYEAR).toFloat() / (maxYEAR - minYEAR).toFloat()) * scrollWidth).toInt()
+        scroll_years.scrollTo(initScrollPos, 0)
+
     }
 
     private fun changeEra() {
         if (txt_era.text == "AD") {
-            if (skbr_year.progress > 0) {
-                skbr_year.progress = skbr_year.progress * -1
+            if (curYEAR > 0) {
+                curYEAR = curYEAR * -1
             }
             txt_era.text = "BC"
         } else {
-            if (skbr_year.progress < 0) {
-                skbr_year.progress = skbr_year.progress * -1
+            if (curYEAR < 0) {
+                curYEAR = curYEAR * -1
             }
             txt_era.text = "AD"
+        }
+    }
+
+    private fun setEra(era: String) {
+        if (era == "AD") {
+            txt_era.text = "AD"
+        } else {
+            txt_era.text = "BC"
         }
     }
 
@@ -213,7 +231,7 @@ class MainActivity : AppCompatActivity() {
         val birthYear: Int = figuresList[displayIndex].birthYr
         val deathYear: Int = figuresList[displayIndex].deathYr
 
-        if (skbr_year.progress in birthYear..deathYear) {
+        if (curYEAR in birthYear..deathYear) {
             showDialog(figuresList[displayIndex], true)
         } else {
             showDialog(figuresList[displayIndex], false)
@@ -223,7 +241,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setEraTextView() {
-        if (skbr_year.progress >= 0) {
+        if (curYEAR >= 0) {
             txt_era.text = "AD"
         } else {
             txt_era.text = "BC"

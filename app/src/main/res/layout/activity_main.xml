@@ -97,17 +97,6 @@
 
         </LinearLayout>
 
-        <ca.ggolda.guessayear.utils.VerticalSeekBar
-            android:id="@+id/skbr_year"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:max="2019"
-            android:maxHeight="3dp"
-            android:min="-2000"
-            android:minHeight="3dp"
-            android:progress="1950"
-            android:progressDrawable="@drawable/progress_pathbar"/>
-
     </LinearLayout>
 
 </RelativeLayout>
