@@ -10,13 +10,14 @@
     tools:context=".activities.MainActivity">
 
     <HorizontalScrollView
+        android:id="@+id/scroll_years"
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
+            android:scaleType="center"
             android:src="@drawable/scrollbg" />
 
     </HorizontalScrollView>
