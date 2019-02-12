@@ -19,19 +19,21 @@ import ca.ggolda.guessayear.data.FigureModel
 import kotlinx.android.synthetic.main.dialog_result.view.*
 
 
-
 class MainActivity : AppCompatActivity() {
 
-    val startYEAR: Int = 1
+    private val aliveCODE: Int = 9999
+    private val startYEAR: Int = 1
     val maxYEAR: Int = 2019
     val minYEAR: Int = -2000
+
     var curYEAR: Int = 1
-    private val aliveCODE: Int = 9999
+    var curScore: Int = 0
+
 
     private lateinit var figuresList: List<FigureModel>
+    private var displayIndex: Int = 0
+    private var scrollableRange: Int = 0
     var totalListItems: Int = 0
-    var displayIndex: Int = 0
-    var scrollWidth: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,45 +43,25 @@ class MainActivity : AppCompatActivity() {
         figuresList = DummyDataGen.genDummyList()
         totalListItems = figuresList.size
 
-
-        // Set New Item
-        setNewItem()
-
-        // Set Year and Era Views
-        edt_year.setText("" + startYEAR)
+        // Set Year, Era, and Score TextViews
+        edt_year.setText("$startYEAR")
         setEraTextView()
+        txt_score.text = "$curScore"
 
-
-
-
+        // Set New Quiz Item
+        setNewQuizItem()
 
         // Set ScrollView OnScrollChangeListener
         scroll_years.viewTreeObserver.addOnScrollChangedListener({
             val scrollX = scroll_years.scrollX // For HorizontalScrollView
             // Change Year Based on Scroll Position
-            Log.e("Scroll (X, width)", "($scrollX, $scrollWidth)")
+            Log.e("Scroll (X, width)", "($scrollX, $scrollableRange)")
 
-            val positionToYear = (scrollX.toFloat() / scrollWidth.toFloat()) * (maxYEAR - minYEAR) + minYEAR
+            val positionToYear = ((scrollX.toFloat() / scrollableRange.toFloat()) * (maxYEAR - minYEAR) + minYEAR).toInt()
 
-            Log.e("ScrollViewToYear", "$positionToYear")
-
-            var scrollYearSet = positionToYear.toInt()
-
-            if (scrollYearSet > 0) {
-                edt_year.setText("" + scrollYearSet)
-                setEra("AD")
-            } else if (scrollYearSet < 0) {
-                edt_year.setText("" + scrollYearSet * -1)
-                setEra("BC")
-            } else if (scrollYearSet == 0) {
-                edt_year.setText("1")
-            }
-
-
+            setYearFromScroll(positionToYear)
 
         })
-
-
 
         // Set YearText OnChangeListener
         edt_year.addTextChangedListener(object : TextWatcher {
@@ -91,7 +73,6 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 val yearString = s.toString()
                 var yearInt: Int
-
 
                 yearInt = if (yearString != "") {
                     yearString.toInt()
@@ -109,35 +90,14 @@ class MainActivity : AppCompatActivity() {
                     0 // As there is no zero-year, pass 0 for an empty EditText
                 }
 
+                // Make yearInt negative if in BC
                 if (txt_era.text == "BC") {
                     yearInt *= -1
                 }
 
-                // Set SeekBar if differs from TextView
-                if (yearInt != 0) {
-                    if (yearInt in minYEAR..maxYEAR) {
-                        if (yearInt != curYEAR) {
-                            curYEAR = yearInt
-                        }
-                    } else if (yearInt > maxYEAR) {
-                        yearInt = maxYEAR
-                        if (yearInt != curYEAR) {
-                            curYEAR = yearInt
-                        }
+                // Set year from EditText int
+                setYearFromText(yearInt)
 
-                    } else if (yearInt < minYEAR) {
-                        yearInt = minYEAR
-                        if (yearInt != curYEAR) {
-                            curYEAR = yearInt
-                        }
-                    }
-                } else {
-                    if (curYEAR > 0) {
-                        edt_year.hint = "" + curYEAR
-                    } else {
-                        edt_year.hint = "" + curYEAR * -1
-                    }
-                }
             }
         })
 
@@ -150,12 +110,79 @@ class MainActivity : AppCompatActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        // Get ScrollView Width
-        scrollWidth = scroll_years.getChildAt(0).width - scroll_years.width
-        Log.e("scrollWidth)", "($scrollWidth)")
+        // Get scrollableRange by subtracting screen width from total scrollview width
+        scrollableRange = scroll_years.getChildAt(0).width - scroll_years.width
+        // Set ScrollView to curYEAR
+        setScrollFromYear()
 
-        val initScrollPos = (((curYEAR - minYEAR).toFloat() / (maxYEAR - minYEAR).toFloat()) * scrollWidth).toInt()
-        scroll_years.scrollTo(initScrollPos, 0)
+    }
+
+    private fun setYearFromText(yearInt: Int) {
+        if (yearInt != 0) {
+            if (yearInt in minYEAR..maxYEAR) {
+                if (yearInt != curYEAR) {
+                    curYEAR = yearInt
+                    setScrollFromYear()
+                }
+            } else if (yearInt > maxYEAR) {
+                if (curYEAR != maxYEAR) {
+                    curYEAR = maxYEAR
+                    setScrollFromYear()
+                }
+
+            } else if (yearInt < minYEAR) {
+                if (curYEAR != minYEAR) {
+                    curYEAR = minYEAR
+                    setScrollFromYear()
+                }
+            }
+        } else {
+            if (txt_era.text == "AD") {
+                edt_year.hint = "" + curYEAR
+            } else {
+                edt_year.hint = "" + curYEAR * -1
+            }
+        }
+    }
+
+    private fun setScrollFromYear() {
+        // Convert curYEAR to position in scrollableRange, then scrollTo(position)
+        // note + 1 added to curYEAR in "AD" condition to account for no year-zero
+        val scrollPosFromYear: Int =
+                if (curYEAR > 0) {
+                    ((((curYEAR + 1) - minYEAR).toFloat() / (maxYEAR - minYEAR).toFloat()) * scrollableRange).toInt()
+                } else {
+                    (((curYEAR - minYEAR).toFloat() / (maxYEAR - minYEAR).toFloat()) * scrollableRange).toInt()
+                }
+
+        scroll_years.scrollTo(scrollPosFromYear, 0)
+    }
+
+    private fun setYearFromScroll(setYear: Int) {
+
+        Log.e("ScrollViewToYear", "$setYear")
+
+        var tempYear = setYear
+
+        if (tempYear > maxYEAR) {
+            tempYear = maxYEAR
+        } else if (tempYear < minYEAR) {
+            tempYear = minYEAR
+        }
+
+        if (curYEAR != tempYear) {
+            curYEAR = tempYear
+
+            if (tempYear > 0) {
+                edt_year.setText("" + tempYear)
+                setEra("AD")
+            } else if (setYear < 0) {
+                edt_year.setText("" + tempYear * -1)
+                setEra("BC")
+            } else if (tempYear == 0) {
+                edt_year.setText("1")
+            }
+        }
 
     }
 
@@ -171,6 +198,7 @@ class MainActivity : AppCompatActivity() {
             }
             txt_era.text = "AD"
         }
+        setScrollFromYear()
     }
 
     private fun setEra(era: String) {
@@ -181,7 +209,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setNewItem() {
+    private fun setNewQuizItem() {
         // Pick Random Item From List
         displayIndex = grabRandomFromList().index
 
@@ -226,6 +254,16 @@ class MainActivity : AppCompatActivity() {
         throw Resources.NotFoundException()
     }
 
+    private fun addScore() {
+        curScore += 1
+        txt_score.text = "$curScore"
+    }
+
+    private fun clearScore() {
+        curScore = 0
+        txt_score.text = "$curScore"
+    }
+
 
     private fun showDialog(item: FigureModel, isCorrect: Boolean) {
         val view = layoutInflater.inflate(R.layout.dialog_result, null)
@@ -265,10 +303,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            addScore()
+
             dialogLayout.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorCorrect))
 
-            val mp = MediaPlayer.create (this, R.raw.correct)
-            mp.start ()
+            val mp = MediaPlayer.create(this, R.raw.correct)
+            mp.start()
 
 
         } else {
@@ -294,10 +334,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            clearScore()
+
             dialogLayout.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.colorIncorrect))
 
-            val mp = MediaPlayer.create (this, R.raw.incorrect)
-            mp.start ()
+            val mp = MediaPlayer.create(this, R.raw.incorrect)
+            mp.start()
 
         }
 
@@ -306,7 +348,7 @@ class MainActivity : AppCompatActivity() {
         okBtn.setOnClickListener {
             if (isCorrect) {
                 // Set new item since they were right!
-                setNewItem()
+                setNewQuizItem()
             }
             resultsDialog.dismiss()
         }

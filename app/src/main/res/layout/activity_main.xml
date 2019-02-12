@@ -22,6 +22,17 @@
 
     </HorizontalScrollView>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="48dp"
+        android:textStyle="bold"
+        android:id="@+id/txt_score"
+        android:text="YOLO!"
+        android:textColor="@android:color/white"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"/>
+
 
 
     <LinearLayout
