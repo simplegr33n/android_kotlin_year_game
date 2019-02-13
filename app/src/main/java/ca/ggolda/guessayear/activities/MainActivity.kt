@@ -9,6 +9,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import java.util.*
 import android.app.AlertDialog
+import android.content.Intent
 import android.media.MediaPlayer
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.res.ResourcesCompat
@@ -16,6 +17,7 @@ import android.util.Log
 import android.widget.Button
 import ca.ggolda.guessayear.utils.DummyDataGen
 import ca.ggolda.guessayear.data.FigureModel
+import ca.ggolda.guessayear.services.AudioService
 import kotlinx.android.synthetic.main.dialog_result.view.*
 
 
@@ -103,6 +105,11 @@ class MainActivity : AppCompatActivity() {
         // Set Guess ("Confirm") Button OnClickListener
         btn_guess.setOnClickListener { guessPress() }
         txt_era.setOnClickListener { changeEra() }
+
+
+        val audioServiceIntent = Intent(applicationContext, AudioService::class.java)
+        startService(audioServiceIntent)
+
 
     }
 
